@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 
 public class MainPage extends JFrame implements ActionListener {
@@ -11,7 +12,7 @@ public class MainPage extends JFrame implements ActionListener {
     HashMap<String, String> currencies;
 
     // Container for the MainPage
-    Container content = getContentPane();
+    Container content;
 
 
     // Labels for text field and text field objects
@@ -71,7 +72,9 @@ public class MainPage extends JFrame implements ActionListener {
 
         // creates a map of all currency words with its respective symbol
         this.currencies = setCurrencySymbols(currencyWord);
-
+        this.content = getContentPane();
+        this.setSize(450, 150);
+        this.setLocationRelativeTo(null);
         content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
 
         JPanel fromPanel = new JPanel();
@@ -83,7 +86,6 @@ public class MainPage extends JFrame implements ActionListener {
         fromPanel.add(fromTextField);
         fromPanel.add(fromComboBox);
         content.add(fromPanel);
-
 
         JPanel toPanel = new JPanel();
         toLabel = new JLabel("To: ");
@@ -114,21 +116,33 @@ public class MainPage extends JFrame implements ActionListener {
                 String toCurrency = toComboBox.getSelectedItem().toString();
                 String toCurrencySymbol = currencies.get(toCurrency);
 
-                String request = ("from: " + fromAmount + " " +
-                        fromCurrencySymbol + ", " + "to: " + toCurrencySymbol);
-                System.out.println(request);
                 client = new ConverterClient(toCurrencySymbol, fromCurrencySymbol, fromAmount);
+                String convertedAmount = client.convertedAmount;
+                float parseFloat = Float.parseFloat(convertedAmount);
+                DecimalFormat dfZero = new DecimalFormat("0.00");
+                String formattedString = dfZero.format(parseFloat);
+
+                String outputMessage = "%s %s (%s) is equal to %s %s (%s)" +
+                        "\n Thanks for using the Currency Converter!";
+                String formattedOutput = String.format(outputMessage, fromAmount, fromCurrency, fromCurrencySymbol,
+                        formattedString, toCurrency, toCurrencySymbol);
 
                 JOptionPane pane = new JOptionPane();
-                pane.showMessageDialog( null, "Thanks for using the converter!",
+                JFrame frame = new JFrame();
+                JPanel panel = new JPanel();
+                panel.add(new JLabel(formattedOutput));
+                frame.add(panel);
+
+                pane.showMessageDialog(frame, formattedOutput,
                         title, JOptionPane.INFORMATION_MESSAGE);
 
             } catch (Exception ioException) {
                 ioException.printStackTrace();
             }
         } else if (e.getSource() == convertButton && fromTextField.getText().isEmpty()) {
+
             JOptionPane pane = new JOptionPane();
-            pane.showMessageDialog( null,"Please enter an amount!1",
+            pane.showMessageDialog( null,"Please enter an amount!",
                     title, JOptionPane.ERROR_MESSAGE);
         }
     }

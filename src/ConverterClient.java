@@ -13,6 +13,11 @@ public class ConverterClient {
     public ObjectInputStream ois; // initializes the ObjectInputStream
     public OkHttpClient okHttpClient;
 
+    String toCurrency;
+    String fromCurrency;
+    String fromAmount;
+    String convertedAmount;
+
     ConverterClient(String toCurrency, String fromCurrency, String fromAmount) throws IOException {
 
         this.oos = new ObjectOutputStream(new FileOutputStream("output.txt"));
@@ -42,17 +47,17 @@ public class ConverterClient {
             System.out.println(stringResponse); // PRINTS JSON STRING
 
             JSONObject jsonObject = new JSONObject(stringResponse);
-            fromCurrency = jsonObject.getJSONObject("query").getString("from");
-            toCurrency = jsonObject.getJSONObject("query").getString("to");
-            fromAmount = jsonObject.getJSONObject("query").get("amount").toString();
-            String output = jsonObject.get("result").toString();
+            this.fromCurrency = jsonObject.getJSONObject("query").getString("from");
+            this.toCurrency = jsonObject.getJSONObject("query").getString("to");
+            this.fromAmount = jsonObject.getJSONObject("query").get("amount").toString();
+            this.convertedAmount = jsonObject.get("result").toString();
 
             System.out.println(fromCurrency);
             System.out.println(toCurrency);
             System.out.println(fromAmount);
-            System.out.println(output);
+            System.out.println(convertedAmount);
 
-            oos.writeObject(output);
+            oos.writeObject(convertedAmount);
 
         }
 
@@ -71,8 +76,7 @@ public class ConverterClient {
             @Override
             public void run() {
                 MainPage page = new MainPage(); // shows login page upon start
-                page.setSize(600, 600);
-                page.setLocationRelativeTo(null);
+
                 page.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 page.setVisible(true);
             }
